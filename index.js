@@ -30,6 +30,10 @@ async function run() {
     const cartCollection = client.db("restaurentDB").collection("carts");
 
     //User Related API
+    app.get("/users", async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
     app.post("/users", async (req, res) => {
       const user = req.body;
       //Insert email if user doesnot exists:
