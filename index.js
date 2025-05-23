@@ -41,7 +41,7 @@ async function run() {
 
     //Middlewares
     const verifyToken = (req, res, next) => {
-      console.log("Inside Verify Token", req.headers);
+      console.log("Inside Verify Token", req.headers.authorization);
       if (!req.headers.authorization) {
         return res.status(401).send({ message: "Forbidden Access" });
       }
@@ -60,6 +60,21 @@ async function run() {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
+
+    app.get("/user/admin/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      if (email !== req.decoded.email) {
+        return res.status(403).send({ message: "Unauthorized Access" });
+      }
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      let admin = false;
+      if (user) {
+        admin = user?.role === "admin";
+      }
+      res.send({ admin });
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       //Insert email if user doesnot exists:
