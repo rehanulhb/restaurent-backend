@@ -296,7 +296,7 @@ async function run() {
           },
           {
             $group: {
-              _id: "menuItems.category",
+              _id: "$menuItems.category",
               quantity: { $sum: 1 },
               revenue: { $sum: "$menuItems.price" },
             },
