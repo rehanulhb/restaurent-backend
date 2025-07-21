@@ -4,6 +4,9 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
+const mailgun = new Mailgun(formData);
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -231,6 +234,9 @@ async function run() {
         },
       };
       const deleteResult = await cartCollection.deleteMany(query);
+
+      //Send user email about payment confirmation
+
       res.send({ paymentResult, deleteResult });
     });
 
