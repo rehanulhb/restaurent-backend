@@ -7,6 +7,11 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const formData = require("form-data");
 const Mailgun = require("mailgun.js");
 const mailgun = new Mailgun(formData);
+const mg = mailgun.client({
+  username: "api",
+  key: process.env.MAIL_GUN_API_KEY,
+});
+
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -236,6 +241,22 @@ async function run() {
       const deleteResult = await cartCollection.deleteMany(query);
 
       //Send user email about payment confirmation
+      mg.messages
+        .create(process.env.MAIL_SENDING_DOMAIN, {
+          from: "Excited User <postmaster@sandbox413128f9088045d5a7016ba665d06702.mailgun.org>",
+          to: ["onlinestaff7@gmail.com"],
+          subject: "Restaurent - Order Confirmation - Your Purchase",
+          text: "Thank you for your Order",
+          html: `
+            <div>
+            <h2>thank you for your order</h2>
+            <h4>Your Transaction id: <strong>${payment.transactionId}</strong></h4>
+            <p>We would like to get your Feedback</p>
+            </div>
+          `,
+        })
+        .then((msg) => console.log(msg)) // logs response data
+        .catch((err) => console.error(err)); // logs any error
 
       res.send({ paymentResult, deleteResult });
     });
